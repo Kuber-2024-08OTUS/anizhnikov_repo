@@ -1,0 +1,13 @@
+releases:
+  - name: kafka-prod
+    namespace: prod
+    createNamespace: true
+    chart: bitnami/kafka
+    values:
+      - "./kafka-values-prod.yaml"
+  - name: kafka-dev
+    namespace: dev
+    createNamespace: true
+    chart: bitnami/kafka
+    values:
+      - "./kafka-values-dev.yaml"  
