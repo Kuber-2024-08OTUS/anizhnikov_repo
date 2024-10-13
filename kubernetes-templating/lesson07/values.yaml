@@ -1,0 +1,66 @@
+# Default values for lesson07.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+configMap:
+  db:
+    given: Andrey
+    family: Ni
+    village: Likovo
+    age: "33"
+    state: SU
+    year: "2025"
+    month: "8"
+    day: "40"
+    hour: "25"
+
+serviceAccount:
+  enable: true
+  name: monitoring
+
+storageClass:
+  provisioner: ""
+
+pv:
+  storage: 
+    size: 100Mi
+  path: /srv/
+  nodeAffinity: false
+  label: "default"
+
+pvc:
+  storage:
+    request_size: 50Mi
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+ingress:
+  host: homework.otus
+
+image:
+  name: nginx
+  repository: bxggs/nginx-autoindex
+  tag: latest
+  init01_name: install 
+  init01_repository: busybox
+  init01_tag: 1.28
+  init02_name: metrics 
+  init02_repository: curlimages/curl
+  init02_tag: latest  
+
+application:
+  name: nginx
+  port: 8000
+  path:
+    root: /homework
+    conf: /conf
+
+deployment:
+    nodeSelector: false
+    containerPort: 8000
+    readinessProbe: true
