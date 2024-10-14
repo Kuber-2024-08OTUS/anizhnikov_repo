@@ -1,0 +1,12 @@
+Thank you for installing {{ .Chart.Name }}.
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+Application URL:
+  http://{{ .Values.ingress.host }}:30937
+  http://{{ .Values.ingress.host }}{{ .Values.application.path.conf }}:30937
+

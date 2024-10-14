@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-conf
+  namespace: {{ .Release.Namespace }}
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  5;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       {{ .Values.application.port }} ;
+          server_name  _;
+          root {{ .Values.application.path.root }};
+
+          location {{ .Values.application.path.conf }} {
+            disable_symlinks off;
+            autoindex on;
+
+            proxy_no_cache 1;
+            add_header Last-Modified $date_gmt;
+            add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+            if_modified_since off;
+            expires off;
+            etag off;
+
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $realpath_root;     
+        }
+          location / {
+            index  index.html;
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cfgmap-values
+  namespace: {{ .Release.Namespace }}
+data:
+  release: {{ $.Release.Name }}
+  {{- range $key, $val := .Values.configMap.db }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  namespace: {{ .Release.Namespace }}
+  labels: 
+    app: {{ .Values.application.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector: 
+    matchLabels:
+      app: {{ .Values.application.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.application.name }}
+        namespace: {{ .Release.Namespace }}
+    spec:
+      serviceAccountName: {{- if eq .Values.serviceAccount.enable true }} {{ .Values.serviceAccount.name }} {{ else }} "default" {{- end }}
+      {{- if eq .Values.deployment.nodeSelector true }}
+      nodeSelector:
+        homework: "true"
+      {{- end }}
+      containers:
+      - name: {{ .Values.image.name }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - name: liveness-port
+          containerPort: {{ .Values.deployment.containerPort }}
+        {{- if eq .Values.deployment.readinessProbe true }}
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: liveness-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 1
+        {{- end }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","rm -rf /homework/index.html"]
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+        - name: datastore
+          mountPath: {{ .Values.application.path.root }}
+        - name: homework-conf
+          mountPath: {{ .Values.application.path.root }}{{ .Values.application.path.conf }}
+    # These containers are run during pod initialization
+      initContainers:
+      - name: {{ .Values.image.init01_name }}
+        image: {{ .Values.image.init01_repository }}:{{ .Values.image.init01_tag }}
+        command:
+        - wget
+        - "-O"
+        - "/init/index.html"
+        - http://info.cern.ch
+        volumeMounts:
+        - name: datastore
+          mountPath: "/init"
+      - name: {{ .Values.image.init02_name }}
+        image: {{ .Values.image.init02_repository }}:{{ .Values.image.init02_tag }}
+        command: ["/bin/ash", "-c"]
+        args: ['curl --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET https://kubernetes.default.svc/metrics -o /init/metrics.html']
+        volumeMounts:
+        - name: datastore
+          mountPath: "/init"
+      volumes:
+      - name: datastore
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-pvc-default
+      - name: nginx-conf
+        configMap:
+          name: {{ .Release.Name }}-nginx-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: homework-conf
+        configMap:
+          name: {{ .Release.Name }}-cfgmap-values
