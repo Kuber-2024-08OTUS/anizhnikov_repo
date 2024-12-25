@@ -1,0 +1,234 @@
+alertmanager:
+
+  replicas: 1 
+
+  tolerations:
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+  alertmanagerSpec:
+
+    replicas: 1
+
+    tolerations: 
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    affinity: 
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: infra
+              operator: In
+              values: 
+              - "true"
+
+## End alertmanager
+
+grafana:
+
+  replicas: 1 
+
+  tolerations: 
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: loki
+        type: loki
+        url: http://loki-loki-distributed-gateway.logging
+
+## End grafana
+
+kubeApiServer:
+
+  tolerations: 
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+## End kubeApiServer
+
+prometheusOperator: 
+
+  replicas: 1 
+
+  admissionWebhooks:
+
+    deployment:
+
+      tolerations: 
+        - key: "node-role"
+          operator: "Equal"
+          value: "infra"
+          effect: "NoSchedule"
+
+      affinity: 
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: infra
+                operator: In
+                values: 
+                - "true"
+
+    patch:
+
+      tolerations: 
+        - key: "node-role"
+          operator: "Equal"
+          value: "infra"
+          effect: "NoSchedule"
+
+      affinity: 
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: infra
+                operator: In
+                values: 
+                - "true"
+
+  tolerations: 
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+## End prometheusOperator
+
+prometheus: 
+
+  replicas: 1 
+
+  tolerations:
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+  prometheusSpec:
+
+    replicas: 1
+
+    tolerations: 
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    affinity: 
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: infra
+              operator: In
+              values: 
+              - "true"
+
+## End prometheus
+
+prometheus-node-exporter: 
+
+  replicas: 1 
+
+  tolerations:
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"
+
+
+kube-state-metrics:
+
+  replicas: 1 
+
+  tolerations:
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+
+  affinity: 
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: infra
+            operator: In
+            values: 
+            - "true"

@@ -1,0 +1,102 @@
+promtail:
+  daemonset:
+    enabled: true
+  autoscaling:
+    enabled: true
+
+  tolerations:
+  - key: "node-role"
+    operator: "Equal"
+    value: "infra"
+    effect: "NoSchedule"
+
+loki-distributed:
+
+  loki:
+
+    structuredConfig:
+      storage_config:
+        aws:
+          bucketnames: s3-l10
+          endpoint: storage.yandexcloud.net
+          region: ru-central1
+          access_key_id: xxx
+          secret_access_key: xxx
+          insecure: false
+          sse_encryption: false
+          s3forcepathstyle: true
+
+      schema_config:
+        configs:
+          - from: 2024-01-01
+            store: boltdb-shipper
+            object_store: s3
+            schema: v11
+            index:
+              prefix: loki_index_
+              period: 24h
+
+  ingester:
+
+    replicas: 1
+
+    tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    nodeSelector:
+        infra: "true"
+
+  distributor: 
+    
+    replicas: 1
+
+    tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    nodeSelector:
+      infra: "true"   
+
+  querier: 
+
+    replicas: 1
+
+    tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    nodeSelector:
+      infra: "true" 
+
+  queryFrontend: 
+
+    replicas: 1
+
+    tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+
+    nodeSelector:
+      infra: "true" 
+
+  gateway:
+
+    replicas: 1
+
+    tolerations:
+      - key: "node-role"
+        operator: "Equal"
+        value: "infra"
+        effect: "NoSchedule"
+    
+    nodeSelector:
+      infra: "true" 
