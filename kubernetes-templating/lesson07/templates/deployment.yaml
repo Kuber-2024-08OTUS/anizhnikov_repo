@@ -5,6 +5,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels: 
     app: {{ .Values.application.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   minReadySeconds: 10
@@ -69,8 +71,9 @@ spec:
           mountPath: "/init"
       - name: {{ .Values.image.init02_name }}
         image: {{ .Values.image.init02_repository }}:{{ .Values.image.init02_tag }}
-        command: ["/bin/ash", "-c"]
-        args: ['curl --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET https://kubernetes.default.svc/metrics -o /init/metrics.html']
+        securityContext:
+          runAsUser: 0
+        command: ['sh', '-c', 'curl --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/metrics -o /init/metrics.html']      
         volumeMounts:
         - name: datastore
           mountPath: "/init"
