@@ -21,23 +21,28 @@ serviceAccount:
   name: monitoring
 
 storageClass:
-  provisioner: ""
+  provisioner: "disk-csi-driver.mks.ycloud.io"
 
 pv:
   storage: 
-    size: 100Mi
+    size: 128Mi
   path: /srv/
-  nodeAffinity: false
   label: "default"
 
 pvc:
   storage:
-    request_size: 50Mi
+    request_size: 128Mi
+
+nodeAffinity:
+  enable: true
+  key: "homework"
+  value: "true"
+
 
 service:
   type: ClusterIP
-  port: 8000
-  targetPort: 8000
+  port: 8001
+  targetPort: 8001
 
 ingress:
   host: homework.otus
@@ -48,19 +53,19 @@ image:
   tag: latest
   init01_name: install 
   init01_repository: busybox
-  init01_tag: 1.28
+  init01_tag: latest
   init02_name: metrics 
   init02_repository: curlimages/curl
   init02_tag: latest  
 
 application:
   name: nginx
-  port: 8000
+  port: 8001
   path:
     root: /homework
     conf: /conf
 
 deployment:
-    nodeSelector: false
-    containerPort: 8000
+    nodeSelector: true
+    containerPort: 8001
     readinessProbe: true
