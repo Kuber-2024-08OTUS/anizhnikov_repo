@@ -28,15 +28,15 @@ spec:
   storageClassName: "{{ .Release.Name }}-sc-default"
   local:
     path: {{ .Values.pv.path }}
-  {{- if eq .Values.pv.nodeAffinity true }}
+  {{- if eq .Values.nodeAffinity.enable true }}
   nodeAffinity:
     required:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: kubernetes.io/hostname
+        - key: {{ .Values.nodeAffinity.key }}
           operator: In
           values:
-          - minikube
+          - {{ .Values.nodeAffinity.value }}
   {{- end }}
 ---
 apiVersion: v1
@@ -81,6 +81,22 @@ spec:
   resources:
     requests:
       storage: {{ .Values.pvc.storage.request_size }}
+{{ else if eq .Values.storageClass.provisioner "disk-csi-driver.mks.ycloud.io" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pvc-default
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+  storageClassName: "yc-network-hdd"
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.pvc.storage.request_size }}
 {{ else }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -103,6 +119,7 @@ spec:
   storageClassName: "{{ .Release.Name }}-sc-hostpath"
   accessModes:
     - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
