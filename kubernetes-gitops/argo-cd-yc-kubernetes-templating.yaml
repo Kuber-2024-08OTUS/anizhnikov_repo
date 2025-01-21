@@ -1,0 +1,26 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: yc-kubernetes-templating
+  namespace: gitops
+spec:
+  destination:
+    namespace: homeworkhelm
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: kubernetes-templating/lesson07
+    repoURL: 'https://github.com/Kuber-2024-08OTUS/anizhnikov_repo.git'
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+      - values.yaml
+      valuesObject:
+        replicaCount: 2
+  syncPolicy:
+    automated: 
+      prune: true 
+      selfHeal: true 
+    syncOptions:
+    - CreateNamespace=true
+  project: otus
